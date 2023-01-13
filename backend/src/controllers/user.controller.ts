@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { prismaClient } from '../database/prisma.client'
-import { NotFoundError } from '../helpers/api-errors'
+import { BadRequestError, NotFoundError } from '../helpers/api-errors'
 import { createPasswordHash } from '../services/user.service'
 
 
@@ -12,12 +12,28 @@ export class UserControler {
         const newUser = await prismaClient.user.create({
             data: {
                 username,
-                password:hashPassword,
+                password: hashPassword,
             }
         })
         return res.status(201).json(newUser)
     }
 
+    async createCustomerUser(username: string, password: string) {
+        console.log('## username, password', username, password)
+        const hashPassword = await createPasswordHash(password)
+        try {
+            const newUser = await prismaClient.user.create({
+                data: {
+                    username,
+                    password: hashPassword,
+                }
+            })
+            return newUser
+        } catch (err) {
+            console.log('deu erro', err)
+        }
+
+    }
     async findById(req: Request, res: Response) {
         const { id } = req.params
         const userFound = await prismaClient.user.findUnique({
@@ -29,7 +45,7 @@ export class UserControler {
         if (!userFound) {
             throw new NotFoundError('O usuário não existe')
         }
-        
+
         return res.status(200).json(userFound)
     }
 

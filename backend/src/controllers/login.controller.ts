@@ -1,9 +1,7 @@
 import { Request, Response } from "express"
 import { compare } from "bcrypt"
-import { createToken, findUsername } from "../services/auth.service"
+import { createToken, findUsername } from "../services/login.service"
 import { NotFoundError, Unauthorized } from "../helpers/api-errors"
-import { sign } from "jsonwebtoken"
-// import { createToken } from "../services/user.service"
 
 
 const loginController = {
@@ -20,7 +18,7 @@ const loginController = {
         }
         const token = createToken(userExist.id)
 
-        res.status(200).json({ token: token })
+        res.status(200).json({ token: token, })
     }
 
 }
